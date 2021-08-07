@@ -69,7 +69,8 @@ train_ds = train_ds.shuffle(2048, reshuffle_each_iteration=True, seed=1)
 
 # transform the dataset to contain only ulaw encoded speech and speaker id
 
-def ulaw_encode(wt): # takes waveform tensor range [-32768, +32767], returns ulaw tensor range [0,255]
+def ulaw_encode(wt):
+    # takes waveform tensor (wav_samples,) range [-32768, +32767], returns ulaw tensor range [0,255]
     mu = 255.0  # ulaw encoding parameter standard in North America and Japan
     wf = tf.cast(wt, dtype=tf.float32)
     wf = wf / 32768.0                       # range [-1.0, +1.0)
@@ -84,8 +85,8 @@ def ulaw_encode(wt): # takes waveform tensor range [-32768, +32767], returns ula
     return pos
 
 
-def ulaw_extract(wi):      # waveform int tensor, range [-32768, +32767]
-    pos = ulaw_encode(wi)  # ulaw int tensor, range [0,255]
+def ulaw_extract(wi):      # waveform int tensor, shape (wav_samples,) range [-32768, +32767]
+    pos = ulaw_encode(wi)  # ulaw int tensor, shape (wav_samples,) range [0,255]
     # I now randomly choose a max_samples chunk of speech from within wav_samples for training.
     start_positions = tf.math.maximum(0, tf.shape(pos)[0] - max_samples)
     start = tf.random.uniform(shape=(), minval=0, maxval=start_positions+1, dtype=tf.int32, seed=1)
